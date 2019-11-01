@@ -1,8 +1,7 @@
 import telebot
 import time
 
-from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
-
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, ForceReply
 
 bot_token = "953344597:AAHDbeo6Qc9R8GEsoYCUU1BpkVBp0SqACAQ"
 messages = {
@@ -15,27 +14,18 @@ bot = telebot.TeleBot(token=bot_token)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.send_message(message.chat.id, messages["start"])
+    bot.send_message(message.chat.id, messages["start"], reply_markup=ForceReply())
 
 
 @bot.message_handler(commands=['help'])
-def send_weclome(message):
+def send_help(message):
     bot.send_message(message.chat.id, messages["help"])
 
-@bot.message_handler(content_types=['text'])
-def repeat_all_messages(message):
-    send_welcome(message)
 
-@bot.callback_query_handler(func=lambda call: True)
+@bot.message_handler(func=lambda msg: True, content_types=['text'])
 def  test_callback(call):
-    print(call)
-    user_id = call.from_user.id
-    user_name = call.from_user.first_name
-    number = call.data
+    reminder_text = call.text
 
-    bot.delete_message(call.message.chat.id, call.message.message_id)
-
-    bot.send_message(user_id, "Dear "+user_name+"\nCall "+number)
 """
 def send_message(id, chatID):
     order = Order.query.all()
