@@ -1,7 +1,8 @@
 import telebot
 import time
 
-from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, ForceReply
+from flask import request, Flask
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, ForceReply, Update
 
 bot_token = "953344597:AAHDbeo6Qc9R8GEsoYCUU1BpkVBp0SqACAQ"
 messages = {
@@ -11,9 +12,14 @@ messages = {
 }
 
 bot = telebot.TeleBot(token=bot_token)
+app = Flask(__name__)
+
+reminders = []
+chat_id = 0
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
+    chat_id = message.chat.id
     bot.send_message(message.chat.id, messages["start"], reply_markup=ForceReply())
 
 
@@ -24,8 +30,14 @@ def send_help(message):
 
 @bot.message_handler(func=lambda msg: True, content_types=['text'])
 def  test_callback(call):
-    reminder_text = call.text
+    reminders.append(call.text)
 
+
+@app.route('/', methods=['POST'])
+def telegram_web_hook():
+    update = Update.de_json(request.stream.read().decode('utf-8'))
+    bot.process_new_updates([update])
+    return 'ok', 200
 """
 def send_message(id, chatID):
     order = Order.query.all()
@@ -38,8 +50,6 @@ def send_message(id, chatID):
     bot.send_message(chatID, "Destroy manager!", reply_markup=reply)
 """
 if __name__ == "__main__":
-    while True:
-        try:
-            bot.polling()
-        except:
-            time.sleep(3)
+    app.run()
+    if time.localtime().tm_sec == 0:
+        bot.send_message(chat_id, reminders[0])
