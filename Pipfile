@@ -9,6 +9,7 @@ verify_ssl = true
 pytelegrambotapi = "*"
 flask = "*"
 python-dotenv = "*"
+flask-sqlalchemy = "*"
 
 [requires]
 python_version = "3.7"

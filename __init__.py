@@ -1,10 +1,8 @@
-from flask import Flask
-from telegram import telegram
+from dotenv import load_dotenv
+from app import create_app
 
-app = Flask(__name__)
-
-# telegram - api for telegram app-hook
-app.register_blueprint(telegram)
+load_dotenv()
+app = create_app()
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, use_reloader=False)
